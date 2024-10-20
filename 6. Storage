@@ -1,0 +1,115 @@
+############## List Block Devices and Partitions ####################
+
+-> To see what devices exist on Linux File system
+    -> lsblk   (list block devices)
+
+
+############# Creating Partition ######################
+
+-> All of the block devices are actually referenced as files under /dev directory
+
+-> To see what partitions exist on a block devices
+    -> sudo fdisk --list /dev/sda
+    note: fdisk can be used to create and delete partitions too.
+
+-> cfdisk also used to create and delete partitions too. ( Little easier to use )
+    Eg: sudo cfdisk /dev/sdb
+
+
+############# SWAP ###################
+
+-> To see if system uses any kind of swap areas.
+    -> swapon --show
+
+-> We create a swap file system when patitioning sdb block device.
+   To use a partition as a swap area it has to be prepared.
+   It basically writes some small header data on the partition and labels it.
+   To format a partition as a swap we use below command.
+        -> sudo mkswap /dev/sdb3
+
+-> To see more verbose details of a swap partition
+    -> sudo swapon --verbose /dev/sdb3
+
+-> Once the swap creation complete we can see the swap ares with below command
+    -> swapon --show
+
+Note: If we reboot the system /dev/sdb3 wont be used as a swap anymore becoz the changes we made are temporary.
+
+
+
+-> To stop using a partition as swap use below command
+    ->sudo swapoff /dev/sdb3
+
+Till now we saw how to use a partition as a swap area. But instead of partitions we also use files as swap.
+
+                        -------- (Output file)    
+-> sudo dd if=/dev/zero of=/swap bs=1M count=128            ( 1M * 128 )
+            -----------          ----- (block size)
+            Its a special device file that generates an infinite number of zeros when a application reads from it.
+
+-> sudo dd if=/dev/zero of=/swap bs=1M count=2048 status=progress
+-> sudo chmod 600 /swap
+-> To make use this a swap are
+    ->sudo mkswap /swap
+
+###################### CREATE AND CONFIGURE FILE SYSTEMS ###########################
+
+To store files & diretories in a partition, first we need to create file system on it.
+By default Redhad OS uses XFS filesystem. Ubuntu used ext4 filesystem.
+
+These default might change in the future as they have changed in the past.
+
+To Format a partition with XFS filesystem we can use below commands
+    -> sudo mkfs.xfs /dev/sdb1
+
+To format a partition with EXT4 filesystem we can use below command
+    -> sudo mkfs.ext4 /dev/sdb1
+
+To create filesystem and Label it:
+    -> sudo mkfs.xfs -L "BackupVolume" /dev/sdb1
+
+To Create filesyste, Assign lable and setting inode size
+    -> sudo mkfs.xfs -L "BackupVolume" -i size=512 /dev/sdb1
+
+To force format a partition
+    -> sudo mkfs.xfs -f /dev/sdb1
+
+If we type xfs_ and press tab we can see xfs utilities
+    -> xfs_admin utility can be used to change things on already created filesystem
+
+    -> to view the label of a partition
+        -> sudo xfs_admin -l /dev/sdb1
+    -> to change the label of a partition
+        -> sudo xfs_admin -L="BKP_Volume" /dev/sdb1
+
+Similary we use use mkfs.ext4 
+
+
+############################## CONFIGURE SYSTEMS TO MOUNT FILESYSTEMS AT OR DURING BOOT ##########################
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
